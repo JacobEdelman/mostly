@@ -5,7 +5,9 @@ function lit(x){//for any letter,regex, or number
   }
 }
 var none=lit("");
+//effectively... I want to ensure that I do execute both streams at some
 function or(x,y){
+  // so.... what if both>?????
   return function(z){
     var tx=x(z);
     if(tx.match)return tx;
@@ -60,10 +62,13 @@ var rules={};
 //   | - S c
 // - = a b
 // a - = - a
-rules.done = or(cat(point("rules.minus"),lit("c")),cat(point("rules.minus"),point("rules.done"),lit("c")));
-rules.none= cat(point("rules.minus"),lit("c"));
-rules.minus=or(cat(lit("a"),lit("b")),context("b",cat(point("rules.minus"),lit("b")),""))
+//so.... in general I'd like to do both really... aka... try to do both.... but won't that cause slowing????maybe not too mcuh???
+//so what kinda thing is happneing here??
+rules.done = or(cat(point("rules.minus"),point("rules.done"),lit("c")),cat(point("rules.minus"),lit("c")));
+rules.minus=or(context("b",cat(point("rules.minus"),lit("b")),""),cat(lit("a"),lit("b")));
 //rules.end=or(context("",cat(lit("iu"),point("rules.end")),"i"),lit("^"));
 //rules.ident=context("a",or(lit(/[a-zA-Z_$]/),cat(lit(/[a-zA-Z_$0-9]/),point("rules.ident"))),'b');
 console.log(rules.done("aaabbbccc"));
 ///hmmm... so can it parse anything? well in checking to see if something is parsable mine might just add enough to the sides to go on forever... yes I think it is that powerfu;
+// best does ab to minus ,
+//hmm... assuming determinist means that at any point only one possible parse rule will be applicable... that would mean ensuring
