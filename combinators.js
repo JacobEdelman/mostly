@@ -52,7 +52,18 @@ function context(l,x,r){
     return ret;
   }
 }
+function point(n){
+  return eval("(function(){return "+n+".apply(null,arguments)})");
+}
 var rules={};
-rules.ident=context("a",or(lit(/[a-zA-Z_$]/),cat(lit(/[a-zA-Z_$0-9]/),function(){return rules.ident.apply(null,arguments);})),'b');
-console.log(JSON.stringify(rules.ident("ab")));
+// S = - c
+//   | - S c
+// - = a b
+// a - = - a
+rules.done = or(cat(point("rules.minus"),lit("c")),cat(point("rules.minus"),point("rules.done"),lit("c")));
+rules.none= cat(point("rules.minus"),lit("c"));
+rules.minus=or(cat(lit("a"),lit("b")),context("b",cat(point("rules.minus"),lit("b")),""))
+//rules.end=or(context("",cat(lit("iu"),point("rules.end")),"i"),lit("^"));
+//rules.ident=context("a",or(lit(/[a-zA-Z_$]/),cat(lit(/[a-zA-Z_$0-9]/),point("rules.ident"))),'b');
+console.log(rules.done("aaabbbccc"));
 ///hmmm... so can it parse anything? well in checking to see if something is parsable mine might just add enough to the sides to go on forever... yes I think it is that powerfu;
