@@ -4,7 +4,6 @@ function lit(x){//for any letter,regex, or number
     return {match:(matched && matched[0]===y),val:(matched && matched[0]),rightOverflow:"",leftOverflow:""};//not lists
   }
 }
-var none=lit("");
 //effectively... I want to ensure that I do execute both streams at some
 function or(x,y){
   // so.... what if both>?????
@@ -40,11 +39,13 @@ function than(x,y){//so by memoizing this should turn into nearley effectively..
   return zMatcher;
 }
 function cat(){
+
   var ret=arguments[Object.keys(arguments).slice(-1)];
   for(var i=arguments.length-2;i>=0;i--)ret=than(arguments[i],ret);
   return ret;
 }
 function context(l,x,r){
+  //returns a function that will have l,r on the left hand side (on opposite ends) and x on the right
   return function(){
     var ret=x.apply(null,arguments);//no this I guess?
     if(ret.match){
@@ -53,8 +54,8 @@ function context(l,x,r){
     return ret;
   }
 }
-function point(n){
-  return eval("(function(){return "+n+".apply(null,arguments)})");
+function pnt(n){
+  return eval("(function(){return rules."+n+".apply(null,arguments)})");
 }
 function matches(f){
   return function(){
@@ -69,11 +70,16 @@ var rules={};
 // a - = - a
 //so.... in general I'd like to do both really... aka... try to do both.... but won't that cause slowing????maybe not too mcuh???
 //so what kinda thing is happneing here??
-rules.done = or(cat(point("rules.minus"),point("rules.done"),lit("c")),cat(point("rules.minus"),lit("c")));
-rules.minus=or(context("b",cat(point("rules.minus"),lit("b")),""),cat(lit("a"),lit("b")));
+
+ rules.done = or(cat(pnt("minus"),pnt("done"),lit("c")),cat(pnt("minus"),lit("c")));
+ rules.minus=or(context("b",cat(pnt("minus"),lit("b")),""),cat(lit("a"),lit("b")));
 //rules.end=or(context("",cat(lit("iu"),point("rules.end")),"i"),lit("^"));
 //rules.ident=context("a",or(lit(/[a-zA-Z_$]/),cat(lit(/[a-zA-Z_$0-9]/),point("rules.ident"))),'b');
-console.log(matches(rules.done)("aaaabbbbcccc"));
+console.log(matches(rules.done)("abc"));//true
+console.log(matches(rules.done)("aaaaaaaaabbbbbbbbbccccccccc"));//true
+console.log(matches(rules.done)("aaabbcc"));//false
+console.log(matches(rules.done)("aaabbbcc"));//false
+console.log(matches(rules.done)("aabbccc"));//false
 ///hmmm... so can it parse anything? well in checking to see if something is parsable mine might just add enough to the sides to go on forever... yes I think it is that powerfu;
 // best does ab to minus ,
 //hmm... assuming determinist means that at any point only one possible parse rule will be applicable... that would mean ensuring
