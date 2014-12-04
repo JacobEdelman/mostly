@@ -48,14 +48,19 @@ function context(l,x,r){
   return function(){
     var ret=x.apply(null,arguments);//no this I guess?
     if(ret.match){
-      ret.rightOverflow+=r;
-      ret.leftOverflow+=l;
+      return {val:ret.val,match:true,rightOverflow:ret.rightOverflow+r,leftOverflow:l+ret.leftOverflow};
     }
     return ret;
   }
 }
 function point(n){
   return eval("(function(){return "+n+".apply(null,arguments)})");
+}
+function matches(f){
+  return function(){
+    var x=f.apply(null,arguments)
+    return (x.match && !x.rightOverflow && !x.leftOverflow);
+  }
 }
 var rules={};
 // S = - c
@@ -68,7 +73,7 @@ rules.done = or(cat(point("rules.minus"),point("rules.done"),lit("c")),cat(point
 rules.minus=or(context("b",cat(point("rules.minus"),lit("b")),""),cat(lit("a"),lit("b")));
 //rules.end=or(context("",cat(lit("iu"),point("rules.end")),"i"),lit("^"));
 //rules.ident=context("a",or(lit(/[a-zA-Z_$]/),cat(lit(/[a-zA-Z_$0-9]/),point("rules.ident"))),'b');
-console.log(rules.done("aaabbbccc"));
+console.log(matches(rules.done)("aaaabbbbcccc"));
 ///hmmm... so can it parse anything? well in checking to see if something is parsable mine might just add enough to the sides to go on forever... yes I think it is that powerfu;
 // best does ab to minus ,
 //hmm... assuming determinist means that at any point only one possible parse rule will be applicable... that would mean ensuring
