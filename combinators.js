@@ -57,11 +57,8 @@ function context(l,x,r){
 function pnt(n){
   return eval("(function(){return rules."+n+".apply(null,arguments)})");
 }
-function matches(f){
-  return function(){
-    var x=f.apply(null,arguments)
+function matches(x){
     return (x.match && !x.rightOverflow && !x.leftOverflow);
-  }
 }
 var rules={};
 // S = - c
@@ -75,12 +72,12 @@ var rules={};
  rules.minus=or(context("b",cat(pnt("minus"),lit("b")),""),cat(lit("a"),lit("b")));
 //rules.end=or(context("",cat(lit("iu"),point("rules.end")),"i"),lit("^"));
 //rules.ident=context("a",or(lit(/[a-zA-Z_$]/),cat(lit(/[a-zA-Z_$0-9]/),point("rules.ident"))),'b');
-console.log(matches(rules.done)("abc"));//true
-console.log(matches(rules.done)("aabbcc"));//true
-console.log(matches(rules.done)("aaaaaaaaabbbbbbbbbccccccccc"));//true
-console.log(matches(rules.done)("aaabbcc"));//false
-console.log(matches(rules.done)("aaabbbcc"));//false
-console.log(matches(rules.done)("aabbccc"));//false
+console.log(matches(rules.done("abc")));//true
+console.log(matches(rules.done("aabbcc")));//true
+console.log(matches(rules.done("aaaaaaaaabbbbbbbbbccccccccc")));//true
+console.log(matches(rules.done("aaabbcc")));//false
+console.log(matches(rules.done("aaabbbcc")));//false
+console.log(matches(rules.done("aabbccc")));//false
 ///hmmm... so can it parse anything? well in checking to see if something is parsable mine might just add enough to the sides to go on forever... yes I think it is that powerfu;
 // best does ab to minus ,
 //hmm... assuming determinist means that at any point only one possible parse rule will be applicable... that would mean ensuring
