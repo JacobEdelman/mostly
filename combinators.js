@@ -24,12 +24,12 @@ function than(x,y){//so by memoizing this should turn into nearley effectively..
       tx=x(z.slice(0,i));
       if(tx.match){
         ty=y(tx.rightOverflow+z.slice(i));//not that there is no overflow of nonterminals
-        if(ty.match)break;
+        if(ty.match && !ty.leftOverflow)break;
       }
       ty=y(z.slice(i));
       if(ty.match && ty.leftOverflow){//this should prevent annoying things where rightOverflow hasn't works and we don't want to re try it
         tx=x(z.slice(0,i)+ty.leftOverflow);//not that there is no overflow of nonterminals
-        if(tx.match)break;
+        if(tx.match && !tx.rightOverflow)break;
       }
     }
     if(tx.match && ty.match)zMatcher.prototype.memoizer[z]={val:[tx.val,ty.val],match:true,rightOverflow:ty.rightOverflow,leftOverflow:tx.leftOverflow};//good enough
